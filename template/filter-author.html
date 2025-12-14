@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takoy Blog - Post Qidiruvi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-green-50 to-pink-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6 shadow-2xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-4xl font-extrabold tracking-wider gradient-text">Takoy Blog</h1>
+            <nav class="space-x-6">
+                {% if request.user.is_anonymous %}
+                    <a href="{% url 'register' %}" class="hover:text-pink-200 font-semibold text-lg">Registratsiya</a>
+                    <a href="{% url 'login' %}" class="hover:text-pink-200 font-semibold text-lg">Login</a>
+                {% else %}
+                    <a href="{% url 'add_post' %}" class="hover:text-pink-200 font-semibold text-lg">Post Qo‘shish</a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="hover:text-pink-200 font-semibold text-lg bg-transparent border-none cursor-pointer">Logout</button>
+                    </form>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="container mx-auto py-12 px-4">
+        <div class="bg-white rounded-3xl p-8 mb-10 shadow-2xl">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center gradient-text">Post Qidirish</h2>
+
+            <!-- Input для поиска -->
+            <div class="flex justify-center mb-6">
+                <form method="get" action="{% url 'filter_author' %}" class="flex w-full max-w-md">
+                    <input type="text" name="post_name" placeholder="Post nomini kiriting"
+                           value="{{ search_query }}"
+                           class="w-full p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button type="submit"
+                            class="bg-gradient-to-r from-blue-600 to-green-500 text-white px-4 rounded-r-lg font-semibold hover:from-blue-700 hover:to-green-600 transition-all duration-300">
+                        Qidirish
+                    </button>
+                </form>
+            </div>
+
+            <!-- Отображение постов -->
+            {% if blogs %}
+                {% for i in blogs %}
+                <article class="bg-gray-50 rounded-xl p-6 mb-6 shadow-lg">
+                    {% if i.image %}
+                        <img src="{{ i.image.url }}" class="w-full h-72 object-cover rounded-xl mb-6">
+                    {% endif %}
+
+                    <h2 class="text-2xl font-bold mb-2">{{ i.title }}</h2>
+                    <div class="text-sm text-gray-500 mb-4">{{ i.get_date }} • {{ i.author.name }}</div>
+                    <p class="text-gray-700 mb-4">{{ i.desc }}</p>
+                </article>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500">Hech qanday post topilmadi</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p class="text-lg">© 2025 Takoy Blog. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

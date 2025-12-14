@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takoy Blog - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        body {
+            background: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .overlay {
+            background: rgba(0, 0, 0, 0.5);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="overlay flex items-center justify-center">
+
+        <main class="container mx-auto py-12 px-4">
+            <div class="bg-white bg-opacity-90 max-w-md mx-auto rounded-3xl p-8 shadow-2xl">
+
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center gradient-text">Login</h2>
+
+                {% if error %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+
+                   <div>
+    <input name="username" type="text" placeholder="Username" required
+           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    {% if errors.username %}
+        <p class="text-red-600 text-sm mt-1">{{ errors.username }}</p>
+    {% endif %}
+</div>
+
+<div>
+    <input name="password" type="password" placeholder="Parol" required
+           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    {% if errors.password %}
+        <p class="text-red-600 text-sm mt-1">{{ errors.password }}</p>
+    {% endif %}
+</div>
+
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-3 rounded-lg hover:from-blue-700 hover:to-green-600 transition-all duration-300">
+                        Kirish
+                    </button>
+                </form>
+            </div>
+        </main>
+
+    </div>
+</body>
+</html>

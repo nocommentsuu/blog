@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takoy Blog - Asosiy Sahifa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .comment-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-green-50 to-pink-50 min-h-screen">
+    <header class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6 shadow-2xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-4xl font-extrabold tracking-wider gradient-text">Takoy Blog</h1>
+            <nav class="space-x-6">
+                {% if  request.user.is_anonymous %}
+                    <a href="{% url 'register' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Registratsiya</a>
+                    <a href="{% url 'login' %}"  class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Login</a>
+                {% else %}
+                    <a href="{% url 'add_post' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Post Qo‘shish</a>
+                    <a href="{% url 'filter_author' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Post Filteri</a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg bg-transparent border-none cursor-pointer">
+                            Logout
+                        </button>
+                    </form>
+
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-12 px-4">
+        <!-- Post 1 (Rasmli) -->
+
+<article class="bg-white rounded-3xl p-8 mb-10 shadow-2xl hover:shadow-3xl transition-shadow duration-500">
+    {% for i in blogs %}
+        {% if i.image %}
+            {% with i.image.url|lower as file_url %}
+                {% if ".mp4" in file_url %}
+                    <!-- Видео -->
+                    <a href="{{ file_url }}">
+                        <video controls class="w-full h-72 rounded-xl mb-6">
+                            <source src="{{ file_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </a>
+                {% else %}
+                    <!-- Картинка -->
+                    <a href="{{ file_url }}">
+                        <img src="{{ file_url }}"
+                             class="w-full h-72 object-cover rounded-xl mb-6 transform hover:scale-105 transition-transform duration-500">
+                    </a>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">{{ i.title }}</h2>
+        <div class="text-sm text-gray-500 mb-4">{{ i.get_date }} • {{ i.author.name }}</div>
+        <p class="text-gray-700 mb-6 text-lg">{{ i.desc }}</p>
+
+        <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Kommentariyalar</h3>
+
+            <div class="comments-list">
+                {% for comment in i.top_comments %}
+                    <div class="bg-gray-50 p-4 rounded-xl mb-4">
+                        <p class="text-gray-700">
+                            <strong>{{ comment.user }}:</strong> {{ comment.message }} ({{ comment.get_date }})
+                        </p>
+
+                        {% for reply in comment.replies.all %}
+                            <div class="bg-gray-100 p-3 rounded-xl ml-6 mb-2">
+                                <p class="text-gray-700">
+                                    <strong>{{ reply.user }}:</strong> {{ reply.message }} ({{ reply.get_date }})
+                                </p>
+                            </div>
+                        {% endfor %}
+
+                        {% if request.user.is_authenticated %}
+                        <!-- Форма ответа -->
+                        <form method="post" action="{% url 'home' %}" class="mt-2 ml-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="blog_id" value="{{ i.id }}">
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <textarea name="message" rows="1" placeholder="Javob yozing..." class="border p-1 rounded w-2/3"></textarea>
+                            <button type="submit" class="bg-blue-600 text-white px-2 py-1 rounded">Javob</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if request.user.is_authenticated %}
+            <!-- Форма нового комментария -->
+            <form method="post" action="{% url 'home' %}" class="space-y-4 mt-6">
+                {% csrf_token %}
+                <input type="hidden" name="blog_id" value="{{ i.id }}">
+                <textarea name="message" rows="3" placeholder="Kommentariya yozing..." class="w-full p-3 border rounded-lg"></textarea>
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-2 px-6 rounded-lg">Yuborish</button>
+            </form>
+            {% else %}
+                <p class="text-gray-500 mt-4">Kommentariya qoldirish uchun <a href="{% url 'login' %}" class="text-blue-600">kirishingiz kerak</a>.</p>
+            {% endif %}
+
+        </div>
+    {% endfor %}
+</article>
+
+    </main>
+
+    <footer class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p class="text-lg">© 2025 Takoy Blog. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </footer>
+
+    <script>
+        function showMoreComments(button) {
+            const commentsList = button.previousElementSibling;
+            const hiddenComments = commentsList.querySelectorAll('.comment-hidden');
+            hiddenComments.forEach(comment => {
+                comment.classList.remove('comment-hidden');
+            });
+            button.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Takoy Blog - Post Qo‘shish</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-green-50 to-pink-50 min-h-screen">
+    <header class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6 shadow-2xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-4xl font-extrabold tracking-wider gradient-text">Takoy Blog</h1>
+            <nav class="space-x-6">
+            {% if  request.user.is_anonymous %}
+                    <a href="{% url 'register' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Registratsiya</a>
+                    <a href="{% url 'login' %}"  class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Login</a>
+                {% else %}
+                    <a href="{% url 'add_post' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Post Qo‘shish</a>
+                    <a href="{% url 'filter_author' %}" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg">Post Filteri</a>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="hover:text-pink-200 transition-colors duration-300 font-semibold text-lg bg-transparent border-none cursor-pointer">
+                            Logout
+                        </button>
+                    </form>
+
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-12 px-4">
+        <div class="bg-white max-w-md mx-auto rounded-3xl p-8 shadow-2xl">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center gradient-text">Yangi Post Qo‘shish</h2>
+            <form action="{% url 'add_post' %}" method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <input name="title" type="text" placeholder="Post Sarlavhasi" required class="w-full p-3 border border-gray-300 rounded-lg">
+
+    <textarea name="desc" rows="6" placeholder="Post Matni" class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
+
+    <input
+  name="file"
+  type="file"
+  accept="video/mp4,image/*"
+  class="w-full p-3 border border-gray-300 rounded-lg"
+>
+
+
+    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-3 rounded-lg">Postni Yuborish</button>
+</form>
+
+        </div>
+    </main>
+
+    <footer class="bg-gradient-to-r from-blue-600 to-green-500 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p class="text-lg">© 2025 Takoy Blog. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </footer>
+</body>
+</html>
